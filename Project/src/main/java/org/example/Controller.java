@@ -40,16 +40,17 @@ public class Controller {
 
         return ResponseEntity.ok(this.AnimalList);
     }
-    @GetMapping(value = "/animalold", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Animal> AnimallOld() {
-        Animal animal = new Animal("pesho", 17);
 
-        if (animal.getAge() > 15) {
-            return ResponseEntity.ok(animal);
-        } else {
-            return ResponseEntity.notFound().build();
+    @GetMapping(value = "/animallistold", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ArrayList<Animal>> PrintOldAnimals() {
+        ArrayList<Animal> filteredAnimals = new ArrayList<>();
+
+        for (Animal animal : AnimalList) {
+            if (animal.getAge() > 15) {
+                filteredAnimals.add(animal);
+            }
         }
+        return ResponseEntity.ok(filteredAnimals);
     }
 
 }
-
