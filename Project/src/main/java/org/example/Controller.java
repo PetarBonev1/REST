@@ -3,10 +3,7 @@ package org.example;
 import org.example.models.Animal;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 
@@ -50,7 +47,29 @@ public class Controller {
                 filteredAnimals.add(animal);
             }
         }
+
         return ResponseEntity.ok(filteredAnimals);
     }
+    @PutMapping("/animallistold")
+    public ResponseEntity<Animal> updateAnimalName(@RequestParam("name") String currentName, @RequestParam("newName") String newName) {
+        Animal animalToUpdate = findAnimalByName(currentName); 
+
+        animalToUpdate.setName(newName);
+
+        return ResponseEntity.ok(animalToUpdate);
+
+    }
+    private Animal findAnimalByName(String name) {
+
+        for (Animal animal : AnimalList) {
+            if (animal.getName().equals(name)) {
+                return animal;
+            }
+        }
+        return null;
+    }
+
+
+
 
 }
