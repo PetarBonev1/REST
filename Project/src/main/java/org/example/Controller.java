@@ -51,9 +51,7 @@ public class Controller {
         return ResponseEntity.ok(filteredAnimals);
     }
     @PutMapping("/animalchangename/{currentName}")
-    public ResponseEntity<Animal> updateAnimalName(
-            @PathVariable("currentName") String currentName,
-            @RequestParam("newName") String newName) {
+    public ResponseEntity<Animal> updateAnimalName(@PathVariable("currentName") String currentName, @RequestParam("newName") String newName) {
 
         Animal animalToUpdate = findAnimalByName(currentName);
         if (animalToUpdate == null) {
@@ -61,6 +59,13 @@ public class Controller {
         }
         animalToUpdate.setName(newName);
         return ResponseEntity.ok(animalToUpdate);
+    }
+    @DeleteMapping("/animaldelete/{currentName}")
+    public ResponseEntity<String> deleteAnimal(@PathVariable("currentName") String currentName) {
+
+            Animal animalToDelete = findAnimalByName(currentName);
+            AnimalList.remove(animalToDelete);
+            return ResponseEntity.ok("Animal deleted successfully.");
     }
 
     private Animal findAnimalByName(String name) {
