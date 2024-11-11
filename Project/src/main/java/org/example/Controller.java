@@ -50,23 +50,28 @@ public class Controller {
 
         return ResponseEntity.ok(filteredAnimals);
     }
-    @PutMapping("/animallistold")
-    public ResponseEntity<Animal> updateAnimalName(@RequestParam("name") String currentName, @RequestParam("newName") String newName) {
-        Animal animalToUpdate = findAnimalByName(currentName); 
+    @PutMapping("/animalchangename/{currentName}")
+    public ResponseEntity<Animal> updateAnimalName(
+            @PathVariable("currentName") String currentName,
+            @RequestParam("newName") String newName) {
 
+        Animal animalToUpdate = findAnimalByName(currentName);
+        if (animalToUpdate == null) {
+            return ResponseEntity.notFound().build();
+        }
         animalToUpdate.setName(newName);
-
         return ResponseEntity.ok(animalToUpdate);
-
     }
+
     private Animal findAnimalByName(String name) {
 
         for (Animal animal : AnimalList) {
             if (animal.getName().equals(name)) {
                 return animal;
             }
+
         }
-        return null;
+        throw new IllegalArgumentException("Animal not found");
     }
 
 
