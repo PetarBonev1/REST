@@ -1,85 +1,65 @@
 package org.example;
 
 import org.example.models.Animal;
-import org.springframework.http.MediaType;
+import org.example.services.AnimalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-
-
+@RequestMapping("/api")
 public class Controller {
-    ArrayList<Animal> AnimalList = new ArrayList<Animal>();
+
+    private final AnimalService animalService;
+
+    public Controller(AnimalService animalService) {
+        this.animalService = animalService;
+    }
 
     @GetMapping("/public")
-    public String ServText() {
+    public String serveText() {
         return "test";
     }
 
-    @GetMapping(value = "/animal", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Animal> GetAnimall() {
-
-
+    @GetMapping(value = "/animal", produces = "application/json")
+    public ResponseEntity<Animal> getAnimal() {
         Animal animal = new Animal("pesho", 15);
         return ResponseEntity.ok(animal);
     }
+
     @PostMapping("/animal")
-    public ResponseEntity postController(
-            @RequestBody Animal animal) {
-
-        AnimalList.add(animal);
-        return ResponseEntity.ok(animal);
-    }
-    @GetMapping(value = "/animallist", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ArrayList<Animal>> PrintAnimal() {
-
-        return ResponseEntity.ok(this.AnimalList);
+    public ResponseEntity<Animal> addAnimal(@RequestBody Animal animal) {
+        Animal addedAnimal = animalService.addAnimal(animal);
+        return ResponseEntity.ok(addedAnimal);
     }
 
-    @GetMapping(value = "/animallistold", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ArrayList<Animal>> PrintOldAnimals() {
-        ArrayList<Animal> filteredAnimals = new ArrayList<>();
-
-        for (Animal animal : AnimalList) {
-            if (animal.getAge() > 15) {
-                filteredAnimals.add(animal);
-            }
-        }
-
-        return ResponseEntity.ok(filteredAnimals);
+    @GetMapping(value = "/animallist", produces = "application/json")
+    public ResponseEntity<List<Animal>> getAllAnimals() {
+        return ResponseEntity.ok(animalService.getAllAnimals());
     }
+
+    @GetMapping(value = "/animallistold", produces = "application/json")
+    public ResponseEntity<List<Animal>> getAnimalsOlderThan() {
+        return ResponseEntity.ok(animalService.getAnimalsOlderThan(15));
+    }
+
     @PutMapping("/animalchangename/{currentName}")
-    public ResponseEntity<Animal> updateAnimalName(@PathVariable("currentName") String currentName, @RequestParam("newName") String newName) {
-
-        Animal animalToUpdate = findAnimalByName(currentName);
-        if (animalToUpdate == null) {
+    public ResponseEntity<Animal> updateAnimalName(@PathVariable String currentName, @RequestParam String newName) {
+        try {
+            Animal updatedAnimal = animalService.updateAnimalName(currentName, newName);
+            return ResponseEntity.ok(updatedAnimal);
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
-        animalToUpdate.setName(newName);
-        return ResponseEntity.ok(animalToUpdate);
     }
+
     @DeleteMapping("/animaldelete/{currentName}")
-    public ResponseEntity<String> deleteAnimal(@PathVariable("currentName") String currentName) {
-
-            Animal animalToDelete = findAnimalByName(currentName);
-            AnimalList.remove(animalToDelete);
+    public ResponseEntity<String> deleteAnimal(@PathVariable String currentName) {
+        boolean isDeleted = animalService.deleteAnimal(currentName);
+        if (isDeleted) {
             return ResponseEntity.ok("Animal deleted successfully.");
-    }
-
-    private Animal findAnimalByName(String name) {
-
-        for (Animal animal : AnimalList) {
-            if (animal.getName().equals(name)) {
-                return animal;
-            }
-
         }
-        throw new IllegalArgumentException("Animal not found");
+        return ResponseEntity.notFound().build();
     }
-
-
-
-
 }
