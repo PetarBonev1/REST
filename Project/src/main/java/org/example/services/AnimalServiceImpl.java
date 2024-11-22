@@ -1,8 +1,11 @@
 package org.example.services;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.models.Animal;
 import org.springframework.stereotype.Service;
 
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +14,12 @@ public class AnimalServiceImpl implements AnimalService {
 
     private final List<Animal> animalList = new ArrayList<>();
 
+    private static final String FILE_PATH = "animals.json";
+
     @Override
     public Animal addAnimal(Animal animal) {
         animalList.add(animal);
+        //saveToFile();
         return animal;
     }
 
@@ -48,4 +54,14 @@ public class AnimalServiceImpl implements AnimalService {
     public boolean deleteAnimal(String name) {
         return animalList.removeIf(animal -> animal.getName().equals(name));
     }
+
+    //private void saveToFile() {
+    //    ObjectMapper mapper = new ObjectMapper();
+    //    try {
+    //        mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_PATH), animalList);
+    //    } catch (IOException e) {
+    //        e.printStackTrace();
+    //        throw new RuntimeException("Failed to save animals to file", e);
+    //    }
+    //}
 }
