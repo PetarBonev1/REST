@@ -54,14 +54,14 @@ public class AnimalServiceImpl implements AnimalService {
     public boolean deleteAnimal(String name) {
         boolean removed = animalList.removeIf(animal -> animal.getName().equals(name));
         if (removed) {
-            saveToFile(); // Save changes to file after deletion
+            System.out.println("Deleted animal: " + name);
+            saveToFile();
+        } else {
+            System.out.println("Animal not found: " + name);
         }
         return removed;
     }
 
-    /**
-     * Saves the current state of animalList to a JSON file.
-     */
     private void saveToFile() {
         ObjectMapper mapper = new ObjectMapper();
         File file = new File(FILE_PATH);
