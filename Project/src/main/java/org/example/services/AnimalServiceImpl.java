@@ -1,8 +1,8 @@
 package org.example.services;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.models.Animal;
 import org.springframework.stereotype.Service;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -13,19 +13,18 @@ import java.util.List;
 public class AnimalServiceImpl implements AnimalService {
 
     private final List<Animal> animalList = new ArrayList<>();
-
     private static final String FILE_PATH = "animals.json";
 
     @Override
     public Animal addAnimal(Animal animal) {
         animalList.add(animal);
-        //saveToFile();
+        saveToFile(); // Ensure changes are saved to file
         return animal;
     }
 
     @Override
     public List<Animal> getAllAnimals() {
-        return new ArrayList<>(animalList);
+        return new ArrayList<>(animalList); // Return a copy to avoid modifying the internal list
     }
 
     @Override
@@ -44,6 +43,7 @@ public class AnimalServiceImpl implements AnimalService {
         for (Animal animal : animalList) {
             if (animal.getName().equals(currentName)) {
                 animal.setName(newName);
+                saveToFile(); // Save updated data to file
                 return animal;
             }
         }
@@ -52,16 +52,27 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     public boolean deleteAnimal(String name) {
-        return animalList.removeIf(animal -> animal.getName().equals(name));
+        boolean removed = animalList.removeIf(animal -> animal.getName().equals(name));
+        if (removed) {
+            saveToFile(); // Save changes to file after deletion
+        }
+        return removed;
     }
 
-    //private void saveToFile() {
-    //    ObjectMapper mapper = new ObjectMapper();
-    //    try {
-    //        mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_PATH), animalList);
-    //    } catch (IOException e) {
-    //        e.printStackTrace();
-    //        throw new RuntimeException("Failed to save animals to file", e);
-    //    }
-    //}
+    /**
+     * Saves the current state of animalList to a JSON file.
+     */
+    private void saveToFile() {
+        ObjectMapper mapper = new ObjectMapper();
+        File file = new File(FILE_PATH);
+
+        try {
+            System.out.println("Saving to file: " + file.getAbsolutePath());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, animalList);
+            System.out.println("File saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Failed to save file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
